@@ -1,0 +1,25 @@
+<RCC>
+    <qresource prefix="/">
+        <file>res/stocks/О_small.png</file>
+        <file>res/stocks/X_small.png</file>
+        <file>res/stocks/X.png</file>
+        <file>res/stocks/whitr_block_ws.png</file>
+        <file>res/stocks/white_block_nos.png</file>
+        <file>res/stocks/title.png</file>
+        <file>res/stocks/start_btn_na.png</file>
+        <file>res/stocks/start_btn_a.png</file>
+        <file>res/stocks/red_block_ws.png</file>
+        <file>res/stocks/red_block_nos.png</file>
+        <file>res/stocks/O.png</file>
+        <file>res/stocks/minimize.png</file>
+        <file>res/stocks/LOGO.png</file>
+        <file>res/stocks/green_block_ws.png</file>
+        <file>res/stocks/green_block_nos.png</file>
+        <file>res/stocks/give_up_btn_na.png</file>
+        <file>res/stocks/give_up_btn_a.png</file>
+        <file>res/stocks/exit.png</file>
+        <file>res/stocks/concept_background.png</file>
+        <file>res/stocks/background.png</file>
+        <file>res/fonts/MyriadPro-Light.otf</file>
+    </qresource>
+</RCC>
