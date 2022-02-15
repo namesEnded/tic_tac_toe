@@ -47,6 +47,7 @@ private:
     bool isPlayerWin = false;
     bool isPlayerGiveUp= false;
     bool isEnd();
+    void setTieButtonStyleArea(char area[3][3]);
     void checkWhoIsFirst();
     void printCurAreaState();
     void setInterfaceStyle();

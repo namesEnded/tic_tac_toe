@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QTabBar>
 #include "stylehelper.h"
@@ -103,6 +103,10 @@ void MainWindow::resetButtonsStyle()
 
 void MainWindow::computerTurn()
 {
+    std::vector<Point> vectorOfEmptyCells = Checks::emptyCells(area);
+    int numberOfEmptyCells = vectorOfEmptyCells.size();
+
+    if (numberOfEmptyCells==0) isEnd();
     if (isLocked)
     {
         QString style = (currentComputerShape=='X') ? StyleHelper::getXFieldStyle() : StyleHelper::getOFieldStyle();
@@ -111,11 +115,6 @@ void MainWindow::computerTurn()
         area[movePoint.i][movePoint.j] = currentComputerShape;
         changeSpecialButtonStyle(movePoint.i, movePoint.j, style);
         printCurAreaState();
-
-        //int resO = Checks::gameState(area, currentComputerShape);
-        //int resX = Checks::gameState(area, currentUserShape);
-        std::vector<Point> vectorOfEmptyCells = Checks::emptyCells(area);
-        int numberOfEmptyCells = vectorOfEmptyCells.size();
 
         qDebug() << "POINT: " + QString::number(movePoint.i) + ";"+QString::number(movePoint.j) << Qt::endl;
         //qDebug() << "O STATUS: " + QString::number(resO) << Qt::endl;
@@ -182,7 +181,10 @@ void MainWindow::setTieButtonStyle()
 {
     QList<QPushButton*> list = ui->tabWidget->findChildren<QPushButton*>();
     foreach(QPushButton *x, list) {
+       QString oldStyle = x->styleSheet();
+       QString style = oldStyle +StyleHelper::getTieButtonStyle();
        x->setStyleSheet(StyleHelper::getTieButtonStyle());
+//     x->setStyleSheet(style);
     }
 }
 
@@ -282,11 +284,11 @@ bool MainWindow::isEnd()
         }
         else if (res.winner == currentComputerShape)
         {
-            style = (res.winner == 'X')? StyleHelper::getXLoseFieldStyle() : StyleHelper::getOLoseFieldStyle();
+            style = (res.winner == 'X')? StyleHelper::getXWinFieldStyle() : StyleHelper::getOWinFieldStyle();
         }
         if (res.winner == 'T')
         {
-            setTieButtonStyle();
+            setTieButtonStyleArea(area);
         }
         else
         {
@@ -295,15 +297,15 @@ bool MainWindow::isEnd()
                 changeSpecialButtonStyle(res.points[i][0], res.points[i][1], style);
             }
         }
-        delayUI(1);
-        isLocked = true;
         ui->startBtn->setDisabled(true);
-        inProgress = false;
-        resetButtonsStyle();
         ui->startBtn->setDisabled(false);
         ui->startBtn->setText("Start");
         ui->XButton->setDisabled(false);
         ui->OButton->setDisabled(false);
+        inProgress = false;
+        isLocked = true;
+        delayUI(1);
+        resetButtonsStyle();
     }
     else
     {
@@ -311,6 +313,19 @@ bool MainWindow::isEnd()
     }
     return stop;
 }
+
+void MainWindow::setTieButtonStyleArea(char area[3][3])
+{
+    for(int i=0; i<3; i++ )
+    {
+        for(int j=0; j<3; j++ )
+        {
+            QString style = (area[i][j]=='X') ? StyleHelper::getXTieFieldStyle() : StyleHelper::getOTieFieldStyle();
+            changeSpecialButtonStyle(i , j, style);
+        }
+    }
+}
+
 
 void MainWindow::checkWhoIsFirst()
 {

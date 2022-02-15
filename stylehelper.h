@@ -21,6 +21,8 @@ public:
     static QString getOWinFieldStyle();
     static QString getXLoseFieldStyle();
     static QString getOLoseFieldStyle();
+    static QString getXTieFieldStyle();
+    static QString getOTieFieldStyle();
 };
 
 #endif // STYLEHELPER_H

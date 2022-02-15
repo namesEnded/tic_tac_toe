@@ -1,4 +1,4 @@
-#include "stylehelper.h"
+﻿#include "stylehelper.h"
 
 
 QString StyleHelper::getStartButtonsStyle()
@@ -119,7 +119,7 @@ QString StyleHelper::getTieButtonStyle()
 {
     return
      "QPushButton {"
-         "  background-color: rgb(100, 125, 161);"
+         "  background-color: rgb(255, 231, 158);"
          "   border-style: outset;"
          "   border-width: 0px;"
          "   border-radius: 5px;"
@@ -127,15 +127,31 @@ QString StyleHelper::getTieButtonStyle()
      "}"
 
      "QPushButton:pressed {"
-         "  background-color: rgb(86, 101, 120);"
+         "  background-color: rgb(212, 192, 133);"
          "   border-style: inset;"
      "}"
 
      "QPushButton:hover:!pressed {"
-         "  background-color: rgb(86, 101, 120);"
+         "  background-color: rgb(212, 192, 133);"
          "   border-style: inset;"
      "}";
 }
+
+//QString StyleHelper::getTieButtonStyle()
+//{
+//    return
+//     "QPushButton {"
+//         "  background-color: rgb(255, 231, 158);"
+//     "}"
+
+//     "QPushButton:pressed {"
+//         "  background-color: rgb(212, 192, 133);"
+//     "}"
+
+//     "QPushButton:hover:!pressed {"
+//         "  background-color: rgb(212, 192, 133);"
+//     "}";
+//}
 
 QString StyleHelper::getXFieldStyle()
 {
@@ -283,6 +299,56 @@ QString StyleHelper::getOLoseFieldStyle()
 
      "QPushButton:hover:!pressed {"
          "  background-color: rgb(210, 128, 127);"
+         "  border-style: inset;"
+     "}";
+}
+
+QString StyleHelper::getXTieFieldStyle()
+{
+    return
+     "QPushButton {"
+         "  background-color: rgb(255, 231, 158);"
+         "  border-image:url(:/res/stocks/X.png);"
+         "  background-position: center center;"
+         "  background-repeat: no-repeat;"
+         "  border-style: outset;"
+         "  border-width: 0px;"
+         "  border-radius: 5px;"
+         "  border-color: beige;"
+     "}"
+
+     "QPushButton:pressed {"
+         "  background-color: rgb(212, 192, 133);"
+         "  border-style: inset;"
+     "}"
+
+     "QPushButton:hover:!pressed {"
+         "  background-color: rgb(212, 192, 133);"
+         "  border-style: inset;"
+     "}";
+}
+
+QString StyleHelper::getOTieFieldStyle()
+{
+    return
+     "QPushButton {"
+         "  background-color: rgb(255, 231, 158);"
+         "  border-image:url(:/res/stocks/O.png);"
+         "  background-position: center center;"
+         "  background-repeat: no-repeat;"
+         "  border-style: outset;"
+         "  border-width: 0px;"
+         "  border-radius: 5px;"
+         "  border-color: beige;"
+     "}"
+
+     "QPushButton:pressed {"
+         "  background-color: rgb(212, 192, 133);"
+         "  border-style: inset;"
+     "}"
+
+     "QPushButton:hover:!pressed {"
+         "  background-color: rgb(212, 192, 133);"
          "  border-style: inset;"
      "}";
 }
