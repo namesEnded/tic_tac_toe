@@ -16,6 +16,7 @@
 При победе компьютера/игрока выигрышная комбинация символов подсветится зелёным.
 В случае ничьи поле подсвечивается жёлтым цветом.
 
+Файл ресурсов для сборки проекта в QT: https://disk.yandex.ru/d/Gcwm7tu9-SoEHA
 ________
 
 **Tic-tac-toe**
@@ -38,7 +39,7 @@ When the computer/player wins, the winning combination of symbols will be highli
 
 In case of a draw, the field is highlighted in yellow.
 
-
+Link to the resource file for building the project in QT: https://disk.yandex.ru/d/Gcwm7tu9-SoEHA
 ________
 
 Concept:
