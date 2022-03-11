@@ -35,19 +35,29 @@ private:
     char currentUserShape = 'X';
     char currentComputerShape = 'O';
     Ui::MainWindow *ui;
-    char area[3][3] = {
+    char area_3x3[3][3] = {
       {'_','_','_'},
       {'_','_','_'},
       {'_','_','_'}
     };
+    char area_4x4[4][4] = {
+      {'_','_','_','_'},
+      {'_','_','_','_'},
+      {'_','_','_','_'},
+      {'_','_','_','_'}
+    };
+    int areaSize = 3;
     int compRow = 0;
     int compColumn = 2;
     bool inProgress = false;
     bool isLocked = true;
     bool isPlayerWin = false;
     bool isPlayerGiveUp= false;
+    void setAreaSize();
+    void selectedArrayToSpecial(char** area);
+    void specialToSelectedArray(char** area);
     bool isEnd();
-    void setTieButtonStyleArea(char area[3][3]);
+    void setTieButtonStyleArea(char **area);
     void checkWhoIsFirst();
     void printCurAreaState();
     void setInterfaceStyle();

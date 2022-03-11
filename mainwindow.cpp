@@ -20,6 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     ui->tabWidget->tabBar()->hide();
+    setAreaSize();
     setInterfaceStyle();
     configAreaButtons();
 
@@ -103,7 +104,15 @@ void MainWindow::resetButtonsStyle()
 
 void MainWindow::computerTurn()
 {
-    std::vector<Point> vectorOfEmptyCells = Checks::emptyCells(area);
+    char**area = new char* [areaSize];
+    for (int i = 0; i < areaSize; i++)
+    {
+    area[i] = new char [areaSize];
+    }
+    selectedArrayToSpecial(area);
+
+
+    std::vector<Point> vectorOfEmptyCells = Checks::emptyCells(area, areaSize);
     int numberOfEmptyCells = vectorOfEmptyCells.size();
 
     if (numberOfEmptyCells==0) isEnd();
@@ -111,9 +120,25 @@ void MainWindow::computerTurn()
     {
         QString style = (currentComputerShape=='X') ? StyleHelper::getXFieldStyle() : StyleHelper::getOFieldStyle();
         char players[2] = {currentUserShape,currentComputerShape};
-        Point movePoint = Checks::bestMove(area, currentComputerShape,players);
+        Point movePoint;
+        movePoint.i = 0;
+        movePoint.j = 0;
+        if (areaSize == 4)
+        {
+            std::pair<int, Point> computerMove =Checks::bestMove4x4(area, areaSize, currentComputerShape,players, 0, -1000, 1000, false);
+            movePoint.i = computerMove.second.i;
+            movePoint.j = computerMove.second.j;
+        }
+        else if (areaSize == 3)
+        {
+            std::pair<int, Point> computerMove =Checks::bestMove4x4(area, areaSize, currentComputerShape,players, 0, -1000, 1000, false);
+            movePoint.i = computerMove.second.i;
+            movePoint.j = computerMove.second.j;
+            //movePoint = Checks::bestMove(area, areaSize, currentComputerShape,players);
+        }
         area[movePoint.i][movePoint.j] = currentComputerShape;
         changeSpecialButtonStyle(movePoint.i, movePoint.j, style);
+        specialToSelectedArray(area);
         printCurAreaState();
 
         qDebug() << "POINT: " + QString::number(movePoint.i) + ";"+QString::number(movePoint.j) << Qt::endl;
@@ -125,15 +150,38 @@ void MainWindow::computerTurn()
             isLocked = false;
         }
     }
+
+
+
+    for (int i =0; i < areaSize; i++)
+    {
+        delete[] area[i];
+    }
+
+    delete[] area;
 }
 
 void MainWindow::resetArea()
 {
-    for (auto& outer : area)
+
+    if (areaSize == 3)
     {
-        for (auto& inner : outer)
+        for (auto& outer : area_3x3)
         {
-            inner = '_';
+            for (auto& inner : outer)
+            {
+                inner = '_';
+            }
+        }
+    }
+    else if (areaSize == 4)
+    {
+        for (auto& outer : area_4x4)
+        {
+            for (auto& inner : outer)
+            {
+                inner = '_';
+            }
         }
     }
 }
@@ -190,10 +238,40 @@ void MainWindow::setTieButtonStyle()
 
 void MainWindow::configAreaButtons()
 {
-    QGridLayout *grid = qobject_cast<QGridLayout*>(ui->tabWidget->widget(0)->layout());
-    for(int i=0; i<3; i++)
+//    if (ui->tabWidget->currentIndex() == 0)
+//    {
+//        QGridLayout *grid = qobject_cast<QGridLayout*>(ui->tabWidget->widget(0)->layout());
+//        for(int i=0; i<3; i++)
+//        {
+//           for(int j=0; j<3; j++)
+//           {
+//               QPushButton *button = qobject_cast<QPushButton*>(grid->itemAtPosition(i, j)->widget());
+//               button->setProperty("row", i);
+//               button->setProperty("column", j);
+//               connect(button, &QPushButton::clicked, this, &MainWindow::onAreaButtonClicked);
+//           }
+//        }
+//    }
+//    else if (ui->tabWidget->currentIndex() == 1)
+//    {
+//        QGridLayout *grid = qobject_cast<QGridLayout*>(ui->tabWidget->widget(1)->layout());
+//        for(int i=0; i<4; i++)
+//        {
+//           for(int j=0; j<4; j++)
+//           {
+//               QPushButton *button = qobject_cast<QPushButton*>(grid->itemAtPosition(i, j)->widget());
+//               button->setProperty("row", i);
+//               button->setProperty("column", j);
+//               connect(button, &QPushButton::clicked, this, &MainWindow::onAreaButtonClicked);
+//           }
+//        }
+//    }
+
+
+    QGridLayout *grid = qobject_cast<QGridLayout*>(ui->tabWidget->widget(ui->tabWidget->currentIndex())->layout());
+    for(int i=0; i<areaSize; i++)
     {
-       for(int j=0; j<3; j++)
+       for(int j=0; j<areaSize; j++)
        {
            QPushButton *button = qobject_cast<QPushButton*>(grid->itemAtPosition(i, j)->widget());
            button->setProperty("row", i);
@@ -201,11 +279,13 @@ void MainWindow::configAreaButtons()
            connect(button, &QPushButton::clicked, this, &MainWindow::onAreaButtonClicked);
        }
     }
+
 }
 
 void MainWindow::changeSpecialButtonStyle(int i, int j, QString buttonStyle)
 {
-    QGridLayout *grid = qobject_cast<QGridLayout*>(ui->tabWidget->widget(0)->layout());
+    QGridLayout *grid = qobject_cast<QGridLayout*>(ui->tabWidget->widget(ui->tabWidget->currentIndex())->layout());
+    //QGridLayout *grid = qobject_cast<QGridLayout*>(ui->tabWidget->widget(0)->layout());
     QPushButton *button = qobject_cast<QPushButton*>(grid->itemAtPosition(i, j)->widget());
     button->setStyleSheet(buttonStyle);
 }
@@ -245,6 +325,14 @@ void MainWindow::onAreaButtonClicked()
 {
     if (!isLocked)
     {
+        char**area = new char* [areaSize];
+        for (int i = 0; i < areaSize; i++)
+        {
+        area[i] = new char [areaSize];
+        }
+
+        selectedArrayToSpecial(area);
+
         QPushButton *button = qobject_cast<QPushButton*>(sender());
         int row = button->property("row").toInt();
         int column = button->property("column").toInt();
@@ -253,6 +341,7 @@ void MainWindow::onAreaButtonClicked()
             area[row][column] = currentUserShape;
             QString style = (currentUserShape=='X') ? StyleHelper::getXFieldStyle() : StyleHelper::getOFieldStyle();
             button->setStyleSheet(style);
+            specialToSelectedArray(area);
             printCurAreaState();
             if (!isEnd())
             {
@@ -268,33 +357,147 @@ void MainWindow::onAreaButtonClicked()
             style = (area[row][column]=='X') ? StyleHelper::getXFieldStyle() : StyleHelper::getOFieldStyle();
             button->setStyleSheet(style);
         }
+
+        for (int i =0; i < areaSize; i++)
+        {
+            delete[] area[i];
+        }
+        delete[] area;
+    }
+}
+
+void MainWindow::setAreaSize()
+{
+    areaSize = 3;
+
+    if (ui->tabWidget->currentIndex() == 1)
+    {
+       areaSize = 4;
+    }
+
+}
+
+void MainWindow::selectedArrayToSpecial(char **area)
+{
+    if (areaSize == 4)
+    {
+        for (int i =0; i < areaSize; i++)
+        {
+            for (int j =0; j < areaSize; j++)
+            {
+                area[i][j] = area_4x4[i][j];
+            }
+        }
+    }
+    else if(areaSize == 3)
+    {
+        for (int i =0; i < areaSize; i++)
+        {
+            for (int j =0; j < areaSize; j++)
+            {
+                area[i][j] = area_3x3[i][j];
+            }
+        }
+    }
+}
+
+void MainWindow::specialToSelectedArray(char **area)
+{
+    if (areaSize == 4)
+    {
+        for (int i =0; i < areaSize; i++)
+        {
+            for (int j =0; j < areaSize; j++)
+            {
+                area_4x4[i][j] = area[i][j];
+            }
+        }
+    }
+    else if(areaSize == 3)
+    {
+        for (int i =0; i < areaSize; i++)
+        {
+            for (int j =0; j < areaSize; j++)
+            {
+                area_3x3[i][j] = area[i][j] ;
+            }
+        }
     }
 }
 
 bool MainWindow::isEnd()
 {
+    char**area = new char* [areaSize];
+    for (int i = 0; i < areaSize; i++)
+    {
+        area[i] = new char [areaSize];
+    }
+    int points3x3 [3][2] = {{0, 0},
+                            {0, 0},
+                            {0, 0}};
+
+    int points4x4 [4][2] = {{0, 0},
+                            {0, 0},
+                            {0, 0},
+                            {0, 0}};
+
+    selectedArrayToSpecial(area);
     QString style;
     bool stop = true;
-    winState res = Checks::gameState(area);
-    if (res.winner!='N')
+    char winner;
+    if (areaSize == 3)
     {
-        if (res.winner == currentUserShape)
+        winState3x3 res = Checks::gameState3x3(area);
+        winner = res.winner;
+        for (int i = 0; i < 3; i++)
         {
-            style = (res.winner == 'X')? StyleHelper::getXWinFieldStyle() : StyleHelper::getOWinFieldStyle();
+            for (int j = 0; i < 2; i++)
+            {
+                points3x3[i][j] = res.points[i][j];
+            }
         }
-        else if (res.winner == currentComputerShape)
+    }
+    else {
+        winState4x4 res = Checks::gameState4x4(area);
+        winner = res.winner;
+        for (int i = 0; i < 4; i++)
         {
-            style = (res.winner == 'X')? StyleHelper::getXWinFieldStyle() : StyleHelper::getOWinFieldStyle();
+            for (int j = 0; i < 2; i++)
+            {
+                points4x4[i][j] = res.points[i][j];
+            }
         }
-        if (res.winner == 'T')
+    }
+
+    if (winner!='N')
+    {
+        if (winner == currentUserShape)
+        {
+            style = (winner == 'X')? StyleHelper::getXWinFieldStyle() : StyleHelper::getOWinFieldStyle();
+        }
+        else if (winner == currentComputerShape)
+        {
+            style = (winner == 'X')? StyleHelper::getXWinFieldStyle() : StyleHelper::getOWinFieldStyle();
+        }
+        if (winner == 'T')
         {
             setTieButtonStyleArea(area);
         }
         else
         {
-            for(int i = 0; i<3; i++)
+            if (areaSize == 3)
             {
-                changeSpecialButtonStyle(res.points[i][0], res.points[i][1], style);
+                for(int i = 0; i<3; i++)
+                {
+                    changeSpecialButtonStyle(points3x3[i][0], points3x3[i][1], style);
+                }
+            }
+            else if (areaSize == 4)
+            {
+                for(int i = 0; i<4; i++)
+                {
+                    changeSpecialButtonStyle(points4x4[i][0], points4x4[i][1], style);
+                }
             }
         }
         ui->startBtn->setDisabled(true);
@@ -314,11 +517,11 @@ bool MainWindow::isEnd()
     return stop;
 }
 
-void MainWindow::setTieButtonStyleArea(char area[3][3])
+void MainWindow::setTieButtonStyleArea(char **area)
 {
-    for(int i=0; i<3; i++ )
+    for(int i=0; i<areaSize; i++ )
     {
-        for(int j=0; j<3; j++ )
+        for(int j=0; j<areaSize; j++ )
         {
             QString style = (area[i][j]=='X') ? StyleHelper::getXTieFieldStyle() : StyleHelper::getOTieFieldStyle();
             changeSpecialButtonStyle(i , j, style);
@@ -334,11 +537,20 @@ void MainWindow::checkWhoIsFirst()
 
 void MainWindow::printCurAreaState()
 {
+    char**area = new char* [areaSize];
+    for (int i = 0; i < areaSize; i++)
+    {
+    area[i] = new char [areaSize];
+    }
+
+    selectedArrayToSpecial(area);
+
+
     QString output = "";
     qDebug() << "||=====START=====||";
-    for(int i=0; i<3; i++ )
+    for(int i=0; i<areaSize; i++ )
     {
-        for(int j=0; j<3; j++ )
+        for(int j=0; j<areaSize; j++ )
         {
             output += QString(area[i][j]) + " ";
         }
@@ -347,5 +559,12 @@ void MainWindow::printCurAreaState()
     }
     qDebug() << "||======END======||";
     qDebug() << Qt::endl;
+
+    for (int i =0; i < areaSize; i++)
+    {
+        delete[] area[i];
+    }
+
+    delete[] area;
 }
 
